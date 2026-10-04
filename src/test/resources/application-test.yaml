@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:consultant-${random.uuid};MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-test.sql
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+langchain4j:
+  community:
+    zhipuai:
+      chat-model:
+        api-key: test-key

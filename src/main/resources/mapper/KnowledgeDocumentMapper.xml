@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyx.consultant.knowledge.KnowledgeDocumentMapper">
+
+    <!-- 按租户查询文档；版本倒序用于让最新版本优先展示。 -->
+    <select id="findByTenantIdOrderByUpdatedAtDesc"
+            resultType="com.zyx.consultant.knowledge.KnowledgeDocument">
+        SELECT id,
+               tenant_id,
+               uploaded_by,
+               document_key,
+               title,
+               source_uri,
+               content_hash,
+               version,
+               status,
+               error_message,
+               created_at,
+               updated_at
+        FROM knowledge_document
+        WHERE tenant_id = #{tenantId}
+        ORDER BY updated_at DESC, version DESC
+    </select>
+
+    <!-- 判断同一租户、文档 Key 和版本是否已经存在。 -->
+    <select id="existsByTenantIdAndDocumentKeyAndVersion" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM knowledge_document
+            WHERE tenant_id = #{tenantId}
+              AND document_key = #{documentKey}
+              AND version = #{version}
+        )
+    </select>
+</mapper>

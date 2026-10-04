@@ -1,0 +1,23 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: consultant-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: consultant
+      MYSQL_USER: ${MYSQL_USERNAME:?Set MYSQL_USERNAME before starting MySQL}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD before starting MySQL}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD before starting MySQL}
+    ports:
+      - "3306:3306"
+    volumes:
+      - consultant-mysql-data:/var/lib/mysql
+      - ./src/main/resources/db/mysql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u$${MYSQL_USER}", "-p$${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  consultant-mysql-data:

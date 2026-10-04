@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: consultant
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/consultant?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${MYSQL_USERNAME:consultant}
+    password: ${MYSQL_PASSWORD:}
+  sql:
+    init:
+      mode: ${SQL_INIT_MODE:never}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+server:
+  port: 8080
+
+app:
+  chat-memory:
+    ttl: PT24H
+
+langchain4j:
+  community:
+    zhipuai:
+      chat-model:
+        base-url: https://open.bigmodel.cn
+        api-key: ${API_KEY_GLM:${API-KEY-GLM:}}
+        model: glm-5.3-flash
+        log-requests: true
+        log-responses: true
+
+logging:
+  level:
+    dev.langchain4j: debug
