@@ -1,0 +1,19 @@
+services:
+  qdrant:
+    # 使用官方 Qdrant 开源镜像，不需要购买商业向量数据库服务。
+    image: qdrant/qdrant:v1.15.5
+    # 给容器起固定名称，方便 docker logs/exec/stop 操作。
+    container_name: consultant-qdrant
+    # Docker 重启后自动尝试恢复 Qdrant。
+    restart: unless-stopped
+    ports:
+      # REST API：健康检查、管理和浏览器访问。
+      - "6333:6333"
+      # gRPC API：LangChain4j Qdrant 客户端写入和检索。
+      - "6334:6334"
+    volumes:
+      # 把向量数据保存到 Docker volume，避免容器重建导致数据丢失。
+      - consultant-qdrant-data:/qdrant/storage
+
+volumes:
+  consultant-qdrant-data:

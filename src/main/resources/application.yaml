@@ -24,15 +24,33 @@ server:
 app:
   chat-memory:
     ttl: PT24H
+  qdrant:
+    # Qdrant 所在主机；Windows IDEA 能访问 WSL 时通常使用 localhost 或 WSL 地址。
+    host: ${QDRANT_HOST:localhost}
+    # Qdrant gRPC 端口，LangChain4j Qdrant 集成使用它写入向量。
+    port: ${QDRANT_PORT:6334}
+    # 保存企业知识库向量的 Qdrant collection 名称。
+    collection-name: ${QDRANT_COLLECTION:consultant-knowledge}
 
 langchain4j:
   community:
     zhipuai:
       chat-model:
         base-url: https://open.bigmodel.cn
-        api-key: ${API_KEY_GLM:${API-KEY-GLM:}}
+        api-key: ${API_KEY_GLM}
         model: glm-5.3-flash
         log-requests: true
+        log-responses: true
+      embedding-model:
+        # 云端 Embedding API 的兼容接口地址。
+        base-url: https://open.bigmodel.cn
+        # API Key 只从环境变量读取，不能把真实值写进配置文件。
+        api-key: ${API_KEY_GLM}
+        # 将 TextSegment 转成向量的云端模型名称。
+        model: embedding-3
+        # 开启 LangChain4j 请求日志，排查问题时要注意不要泄露密钥。
+        log-requests: true
+        # 开启 LangChain4j 响应日志，生产环境应根据敏感信息策略决定是否开启。
         log-responses: true
 
 logging:

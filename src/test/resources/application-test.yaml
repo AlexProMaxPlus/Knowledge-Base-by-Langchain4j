@@ -19,3 +19,6 @@ langchain4j:
     zhipuai:
       chat-model:
         api-key: test-key
+      embedding-model:
+        api-key: test-key
+        model: embedding-3

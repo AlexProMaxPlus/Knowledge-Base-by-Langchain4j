@@ -87,6 +87,12 @@
             <artifactId>langchain4j-spring-boot-starter</artifactId>
             <version>1.14.0-beta24</version>
         </dependency>
+        <!-- Qdrant 向量存储：保存 Embedding 以及对应的 TextSegment 元数据 -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-qdrant</artifactId>
+            <version>1.14.0-beta24</version>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
