@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyx.consultant.knowledge.KnowledgeSegmentMapper">
+
+    <!-- 只允许检索已经发布的文档，避免半成品或归档版本进入答案依据。 -->
+    <select id="findPublishedDocumentIds" resultType="string">
+        SELECT id
+        FROM knowledge_document
+        WHERE tenant_id = #{tenantId}
+          AND status = 'PUBLISHED'
+          <if test="documentKey != null">
+              AND document_key = #{documentKey}
+          </if>
+          <if test="version != null">
+              AND version = #{version}
+          </if>
+    </select>
+
+    <!--
+      MySQL FULLTEXT 关键词召回。
+      score 是关键词相关性分数，后续会和 Qdrant 的向量排名一起做 RRF 融合。
+    -->
+    <select id="searchPublishedByKeyword"
+            resultType="com.zyx.consultant.knowledge.KnowledgeSegment">
+        SELECT
+            ks.id,
+            ks.vector_id,
+            ks.knowledge_document_id,
+            ks.tenant_id,
+            ks.document_key,
+            ks.version,
+            ks.segment_index,
+            ks.segment_text,
+            ks.source_uri,
+            MATCH(ks.segment_text) AGAINST(
+                #{query} IN NATURAL LANGUAGE MODE
+            ) AS keyword_score
+        FROM knowledge_segment ks
+        INNER JOIN knowledge_document kd
+            ON kd.id = ks.knowledge_document_id
+        WHERE ks.tenant_id = #{tenantId}
+          AND kd.status = 'PUBLISHED'
+          AND MATCH(ks.segment_text) AGAINST(
+              #{query} IN NATURAL LANGUAGE MODE
+          )
+          <if test="documentKey != null">
+              AND ks.document_key = #{documentKey}
+          </if>
+          <if test="version != null">
+              AND ks.version = #{version}
+          </if>
+        ORDER BY keyword_score DESC
+        LIMIT #{limit}
+    </select>
+</mapper>
