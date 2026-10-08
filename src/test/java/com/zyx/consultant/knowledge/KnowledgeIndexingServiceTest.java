@@ -25,6 +25,8 @@ class KnowledgeIndexingServiceTest {
         EmbeddingModel embeddingModel = mock(EmbeddingModel.class);
         // Mock EmbeddingStore，避免测试真的连接 Qdrant。
         EmbeddingStore<TextSegment> embeddingStore = mock(EmbeddingStore.class);
+        // Mock MySQL Mapper，避免索引编排测试依赖真实数据库。
+        KnowledgeSegmentMapper segmentMapper = mock(KnowledgeSegmentMapper.class);
 
         // 准备两段待索引文本，模拟第六课切分后的结果。
         List<TextSegment> segments = List.of(
@@ -46,7 +48,10 @@ class KnowledgeIndexingServiceTest {
 
         // 手动组装服务，模拟 Spring 构造器注入两个依赖。
         KnowledgeIndexingService service =
-                new KnowledgeIndexingService(embeddingModel, embeddingStore);
+                new KnowledgeIndexingService(
+                        embeddingModel,
+                        embeddingStore,
+                        segmentMapper);
 
         // 执行被测试的方法。
         List<String> ids = service.index(segments);
@@ -67,11 +72,13 @@ class KnowledgeIndexingServiceTest {
         // 即使依赖存在，也不调用真实服务；这里仍然使用 Mock。
         EmbeddingModel embeddingModel = mock(EmbeddingModel.class);
         EmbeddingStore<TextSegment> embeddingStore = mock(EmbeddingStore.class);
+        KnowledgeSegmentMapper segmentMapper = mock(KnowledgeSegmentMapper.class);
 
         // 传入空列表，模拟空文件或解析失败后没有生成片段。
         List<String> ids = new KnowledgeIndexingService(
                 embeddingModel,
-                embeddingStore).index(List.of());
+                embeddingStore,
+                segmentMapper).index(List.of());
 
         // 空输入应该得到空 ID 列表。
         assertEquals(List.of(), ids);

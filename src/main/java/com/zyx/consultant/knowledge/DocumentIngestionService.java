@@ -55,7 +55,11 @@ public class DocumentIngestionService {
                 .recursive(MAX_SEGMENT_SIZE, MAX_OVERLAP_SIZE)
                 .split(langchainDocument);
 
-        //
+        // 给每个片段编号，后续 MySQL 关键词召回和 Qdrant 向量召回可以用同一个编号合并。
+        for (int index = 0; index < segments.size(); index++) {
+            segments.get(index).metadata().put("segmentIndex", index);
+        }
+
         return new DocumentSegmentationResult(document.getId(), segments);
     }
 
@@ -71,6 +75,7 @@ public class DocumentIngestionService {
         metadata.put("uploadedBy", document.getUploadedBy());
         metadata.put("documentKey", document.getDocumentKey());
         metadata.put("version", document.getVersion());
+        metadata.put("status", document.getStatus().name());
         metadata.put("sourceUri", document.getSourceUri());
     }
 }

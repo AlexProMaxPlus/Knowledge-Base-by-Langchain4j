@@ -33,3 +33,24 @@ ALTER TABLE knowledge_document
     MODIFY error_message VARCHAR(2000) NULL COMMENT '最近一次处理失败的原因',
     MODIFY created_at TIMESTAMP(6) NOT NULL COMMENT '登记创建时间',
     MODIFY updated_at TIMESTAMP(6) NOT NULL COMMENT '最近更新时间';
+
+CREATE TABLE IF NOT EXISTS knowledge_segment
+(
+    id                   VARCHAR(36)   NOT NULL,
+    vector_id            VARCHAR(128)  NOT NULL,
+    knowledge_document_id VARCHAR(36)  NOT NULL,
+    tenant_id            VARCHAR(64)   NOT NULL,
+    document_key         VARCHAR(128)  NOT NULL,
+    version              INT           NOT NULL,
+    segment_index        INT           NOT NULL COMMENT '同一文档内的片段顺序',
+    segment_text         LONGTEXT      NOT NULL COMMENT '切分后的文本片段',
+    source_uri           VARCHAR(1024) NOT NULL COMMENT '原始文件位置',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_segment_vector_id (vector_id),
+    KEY idx_segment_document (knowledge_document_id),
+    KEY idx_segment_tenant_doc_version (tenant_id, document_key, version),
+    FULLTEXT KEY ft_segment_text (segment_text) WITH PARSER ngram
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci
+  COMMENT = '知识库文本片段表，用于关键词召回和向量来源追踪';

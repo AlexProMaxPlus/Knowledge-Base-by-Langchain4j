@@ -1,6 +1,6 @@
 # LangChain4j Enterprise Knowledge Agent
 
-这是一个基于 Spring Boot、LangChain4j、MyBatis-Plus 和 Redis 的企业知识库客服项目，当前完成到第 6 课。
+这是一个基于 Spring Boot、LangChain4j、MyBatis-Plus 和 Redis 的企业知识库客服项目，当前完成到第 8 课。
 
 ## 当前进度
 
@@ -10,8 +10,11 @@
 - Redis Memory：使用 `ChatMemoryStore` 保存会话消息。
 - 文档管理：使用 MyBatis-Plus 管理租户、上传者、版本和处理状态。
 - 文档解析与切分：使用 LangChain4j 将 UTF-8 文本解析为 `Document`，再切分为 `TextSegment`。
+- 云端 Embedding：使用智谱 `embedding-3` 将片段转换为向量。
+- 向量库：使用 Qdrant 保存向量和片段元数据。
+- RAG 召回：使用 Qdrant 向量召回、MySQL FULLTEXT 关键词召回、租户/发布状态过滤和 LangChain4j 官方重排聚合器。
 
-当前还没有接入 Embedding、向量数据库和在线 RAG 检索。
+当前还没有把重排后的片段接入 ChatModel 生成最终 RAG 回答。
 
 ## 环境要求
 
@@ -50,6 +53,16 @@ $env:MYSQL_ROOT_PASSWORD="your-local-mysql-root-password"
 $env:JAVA_HOME="D:\Program Files\Java\jdk-17"
 mvn clean test -q
 ```
+
+真实 Embedding + Qdrant 集成测试默认关闭。确认 Qdrant 可访问并配置真实智谱 API Key 后，才执行：
+
+```powershell
+$env:RUN_REAL_EMBEDDING_TEST="true"
+$env:API_KEY_GLM="your-zhipu-api-key"
+mvn -Dtest=RealEmbeddingQdrantIntegrationTest test
+```
+
+这个测试会真实调用云端 Embedding API，并向当前 Qdrant collection 写入一条测试向量。
 
 ## Docker MySQL
 

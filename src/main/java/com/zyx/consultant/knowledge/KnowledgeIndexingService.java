@@ -29,15 +29,22 @@ public class KnowledgeIndexingService {
     private final EmbeddingStore<TextSegment> embeddingStore;
 
     /**
+     * MySQL 片段 Mapper：给关键词召回提供可检索的原文。
+     */
+    private final KnowledgeSegmentMapper segmentMapper;
+
+    /**
      * 构造索引服务，并由 Spring 注入云端 Embedding 模型和 Qdrant 存储。
      */
     public KnowledgeIndexingService(
             EmbeddingModel embeddingModel,
-            EmbeddingStore<TextSegment> embeddingStore) {
+            EmbeddingStore<TextSegment> embeddingStore,
+            KnowledgeSegmentMapper segmentMapper) {
         // 保存文本转向量的能力，后续 index 方法会调用它。
         this.embeddingModel = embeddingModel;
         // 保存向量写入 Qdrant 的能力，后续 index 方法会调用它。
         this.embeddingStore = embeddingStore;
+        this.segmentMapper = segmentMapper;
     }
 
     /**
@@ -58,8 +65,19 @@ public class KnowledgeIndexingService {
 
         // 将向量和原始片段按相同下标一起写入 Qdrant。
         // 这样 Qdrant 命中向量后，还能返回原文和来源元数据。
-        return embeddingStore.addAll(
+        List<String> vectorIds = embeddingStore.addAll(
                 embeddings,
                 segments);
+
+        // Qdrant 写入成功后，再把同一批文本片段保存到 MySQL，供关键词召回使用。
+        for (int index = 0; index < segments.size(); index++) {
+            KnowledgeSegment segment = KnowledgeSegment.from(
+                    vectorIds.get(index),
+                    segments.get(index),
+                    index);
+            segmentMapper.insert(segment);
+        }
+
+        return vectorIds;
     }
 }

@@ -26,3 +26,24 @@ COMMENT ON COLUMN knowledge_document.content_hash IS '原始内容哈希，用�
 COMMENT ON COLUMN knowledge_document.version IS '同一租户同一文档 Key 的版本号';
 COMMENT ON COLUMN knowledge_document.status IS '文档状态：DRAFT/PROCESSING/PUBLISHED/FAILED/ARCHIVED';
 COMMENT ON COLUMN knowledge_document.error_message IS '最近一次处理失败的原因';
+
+CREATE TABLE knowledge_segment
+(
+    id                    VARCHAR(36)   NOT NULL PRIMARY KEY,
+    vector_id             VARCHAR(128)  NOT NULL,
+    knowledge_document_id VARCHAR(36)   NOT NULL,
+    tenant_id             VARCHAR(64)   NOT NULL,
+    document_key          VARCHAR(128)  NOT NULL,
+    version               INTEGER       NOT NULL,
+    segment_index         INTEGER       NOT NULL,
+    segment_text          VARCHAR(5000) NOT NULL,
+    source_uri            VARCHAR(1024)  NOT NULL,
+    keyword_score         DOUBLE,
+    CONSTRAINT uk_segment_vector_id UNIQUE (vector_id)
+);
+
+COMMENT ON TABLE knowledge_segment IS '知识库文本片段表，用于关键词召回和向量来源追踪';
+COMMENT ON COLUMN knowledge_segment.vector_id IS 'Qdrant 中对应的向量记录 ID';
+COMMENT ON COLUMN knowledge_segment.knowledge_document_id IS '所属业务文档 ID';
+COMMENT ON COLUMN knowledge_segment.segment_index IS '同一文档内的片段顺序';
+COMMENT ON COLUMN knowledge_segment.segment_text IS '切分后的文本片段';
