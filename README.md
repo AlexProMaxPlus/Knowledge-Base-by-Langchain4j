@@ -1,6 +1,6 @@
 # LangChain4j Enterprise Knowledge Agent
 
-这是一个基于 Spring Boot、LangChain4j、MyBatis-Plus 和 Redis 的企业知识库客服项目，当前完成到第 8 课。
+这是一个基于 Spring Boot、LangChain4j、MyBatis-Plus、Redis、Mysql 的准生产级企业知识库客服项目的框架及实现
 
 ## 当前进度
 
@@ -13,8 +13,11 @@
 - 云端 Embedding：使用智谱 `embedding-3` 将片段转换为向量。
 - 向量库：使用 Qdrant 保存向量和片段元数据。
 - RAG 召回：使用 Qdrant 向量召回、MySQL FULLTEXT 关键词召回、租户/发布状态过滤和 LangChain4j 官方重排聚合器。
+- RAG 接入：使用 LangChain4j 官方 `RetrievalAugmentor` 将召回片段注入 AI Service。
+- 来源与拒答：程序保存真实检索证据，无证据时硬拒答，并用真实来源覆盖模型自报 sources。
+- Tools：增加只读知识文档查询 Tool，并从调用上下文读取租户身份。
 
-当前还没有把重排后的片段接入 ChatModel 生成最终 RAG 回答。
+当前已接入第一版 RAG；高风险 Tool、人工确认、JWT/Session 完整权限上下文和 Agent 工作流仍未完成。
 
 ## 环境要求
 
@@ -81,19 +84,3 @@ MySQL 初始化脚本位于：
 src/main/resources/db/mysql/01-create-knowledge-document.sql
 ```
 
-## 当前接口
-
-```text
-GET /chat?conversationId=session-1&message=你好
-```
-
-文档管理接口：
-
-```text
-POST /api/knowledge/documents
-GET  /api/knowledge/documents?tenantId=company-a
-POST /api/knowledge/documents/{id}/processing
-POST /api/knowledge/documents/{id}/publish
-POST /api/knowledge/documents/{id}/fail?message=...
-POST /api/knowledge/documents/{id}/archive
-```
