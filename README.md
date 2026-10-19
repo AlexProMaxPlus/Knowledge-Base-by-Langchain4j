@@ -2,7 +2,7 @@
 
 这是一个基于 Spring Boot、LangChain4j、MyBatis-Plus、Redis、Mysql 的准生产级企业知识库客服项目的框架及实现
 
-## 当前进度
+## 具体实现
 
 - AI Service：通过 `@AiService` 声明企业知识库客服。
 - 结构化输出：返回 `SupportResponse`。
@@ -16,8 +16,7 @@
 - RAG 接入：使用 LangChain4j 官方 `RetrievalAugmentor` 将召回片段注入 AI Service。
 - 来源与拒答：程序保存真实检索证据，无证据时硬拒答，并用真实来源覆盖模型自报 sources。
 - Tools：增加只读知识文档查询 Tool，并从调用上下文读取租户身份。
-
-当前已接入第一版 RAG；高风险 Tool、人工确认、JWT/Session 完整权限上下文和 Agent 工作流仍未完成。
+...等等
 
 ## 环境要求
 
